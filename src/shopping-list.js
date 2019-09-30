@@ -1,7 +1,9 @@
 import $ from 'jquery';
+import api from './api';
 
 import store from './store';
 import item from './item';
+
 
 const generateItemElement = function (item) {
   let itemTitle = `<span class="shopping-item shopping-item__checked">${item.name}</span>`;
@@ -51,8 +53,12 @@ const handleNewItemSubmit = function () {
     event.preventDefault();
     const newItemName = $('.js-shopping-list-entry').val();
     $('.js-shopping-list-entry').val('');
-    store.addItem(newItemName);
-    render();
+    api.createItem(newItemName)
+      .then(res => res.json())
+      .then((newItem) => {
+        store.addItem(newItem);
+        render();
+      });
   });
 };
 
@@ -79,7 +85,11 @@ const handleEditShoppingItemSubmit = function () {
     event.preventDefault();
     const id = getItemIdFromElement(event.currentTarget);
     const itemName = $(event.currentTarget).find('.shopping-item').val();
-    store.findAndUpdateName(id, itemName);
+/*    store.findAndUpdateName(id, itemName); */
+    const objNewName = {
+      name: itemName
+    };
+    store.findAndUpdate(id, objNewName);
     render();
   });
 };
