@@ -1,7 +1,7 @@
+/* eslint-disable no-console */
 import $ from 'jquery';
 
 import store from './store';
-//import item from './item';
 import api from './api';
 
 const generateItemElement = function (item) {
@@ -85,8 +85,15 @@ const handleEditShoppingItemSubmit = function () {
     event.preventDefault();
     const id = getItemIdFromElement(event.currentTarget);
     const itemName = $(event.currentTarget).find('.shopping-item').val();
-    api.updateItem(id, itemName)
-    render();
+    const newItemName = {
+      name: itemName
+    };
+    api.updateItem(id, newItemName)
+      .then(res => res.json())
+      .then(() => {
+        store.findAndUpdate(id, newItemName);
+        render();
+      });
   });
 };
 
@@ -97,9 +104,15 @@ const handleItemCheckClicked = function () {
     const newChecked = {
       checked: !myItem.checked
     };
-    api.updateItem(id, newChecked);
-    store.findAndUpdate(id, newChecked);
-    render();
+    console.log(`Before Store ${JSON.stringify(store)}`);
+
+    api.updateItem(id, newChecked)
+      .then(res => res.json())
+      .then(() => {
+        store.findAndUpdate(id, newChecked);
+        console.log(`After Store ${JSON.stringify(store)}`);
+        render();
+      });
   });
 };
 
