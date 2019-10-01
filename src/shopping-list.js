@@ -69,14 +69,15 @@ const getItemIdFromElement = function (item) {
 };
 
 const handleDeleteItemClicked = function () {
-  // like in `handleItemCheckClicked`, we use event delegation
   $('.js-shopping-list').on('click', '.js-item-delete', event => {
-    // get the index of the item in store.items
     const id = getItemIdFromElement(event.currentTarget);
-    // delete the item
-    store.findAndDelete(id);
-    // render the updated shopping list
-    render();
+    console.log(`Id is ${JSON.stringify(id)}`);
+
+    api.deleteItem(id)
+      .then(() => {
+        store.findAndDelete(id);
+        render();
+      });
   });
 };
 
@@ -89,7 +90,6 @@ const handleEditShoppingItemSubmit = function () {
       name: itemName
     };
     api.updateItem(id, newItemName)
-      .then(res => res.json())
       .then(() => {
         store.findAndUpdate(id, newItemName);
         render();
@@ -104,13 +104,9 @@ const handleItemCheckClicked = function () {
     const newChecked = {
       checked: !myItem.checked
     };
-    console.log(`Before Store ${JSON.stringify(store)}`);
-
     api.updateItem(id, newChecked)
-      .then(res => res.json())
       .then(() => {
         store.findAndUpdate(id, newChecked);
-        console.log(`After Store ${JSON.stringify(store)}`);
         render();
       });
   });
@@ -130,6 +126,7 @@ const bindEventListeners = function () {
   handleEditShoppingItemSubmit();
   handleToggleFilterClick();
 };
+
 // This object contains the only exposed methods from this module:
 export default {
   render,
