@@ -1,37 +1,58 @@
-//const BASE_URL = 'https://thinkful-list-api.herokuapp.com/robarcand';
-const BASE_URL = 'https://thinkful-list-api.herokuapp.com/larry';
+const BASE_URL = 'https://thinkful-list-api.herokuapp.com/robarcand';
 
-const getItems = function() {
-  return fetch(`${BASE_URL}/items`);
+const getItems = function () {
+  return fetchWrapper(`${BASE_URL}/items`);
 };
 
-function createItem(name) {
-  const newItem = JSON.stringify(
-    {
-      name: name,
-    });
+const createItem = function (name) {
+  let newItem = JSON.stringify({name});
 
-  return fetch(`${BASE_URL}/items`, {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: newItem
+  return fetchWrapper(`${BASE_URL}/items`, {
+    'method': 'post',
+    'headers': {
+      'Content-Type': 'application/json'
+    },
+    'body': newItem
   });
-}
+};
 
-function updateItem(id, updateData) {
-  return fetch(`${BASE_URL}/items/${id}`, {
-    method: 'PATCH',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify(updateData)
+const updateItem = function (id, updateData) {
+  let bodyInfo = JSON.stringify(updateData);
+  return fetchWrapper(`${BASE_URL}/items/${id}`, {
+    'method': 'PATCH',
+    'headers': {
+      'Content-Type': 'application/json'
+    },
+    'body': bodyInfo
   });
-}
+};
 
-function deleteItem(id) {
-  return fetch(`${BASE_URL}/items/${id}`, {
-    method: 'DELETE',
-    headers: {'Content-Type': 'application/json'}
+const deleteItem = function(id) {
+  return fetchWrapper(`${BASE_URL}/items/${id}`, {
+    'method': 'DELETE',
+    'headers': {
+      'Content-Type': 'application/json'
+    }
   });
-}
+};
+
+const fetchWrapper = function (...args) {
+  let error; 
+  return fetch(...args)
+  .then(resp => {
+    if(!resp.ok) {
+      error = {code: resp.status};
+    }
+    return resp.json();
+  })
+  .then(respJson => {
+    if(error) {
+      error.message = respJson.message;
+      return Promise.reject(error);
+    }
+    return respJson;
+  });
+};
 
 export default {
   getItems,
